@@ -8,7 +8,7 @@ fi
 response=$(aws s3api head-bucket --bucket "$1" 2>&1)
 exit_code=$?
 
-if [ exit_code -eq 0 ]; then
+if [ $exit_code -eq 0 ]; then
     echo "Bucket already exists"
 elif echo "$response" | grep -q "403"; then
     echo "Bucket already exists but owned by someone else"

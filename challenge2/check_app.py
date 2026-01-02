@@ -17,9 +17,11 @@ forbidden=[
         "version":"0.1",
         "requirement": "=="
     },
+
+    # if version is smaller then 2.0.0 then forbidden
     {
         "package_name":"requests",
-        "version":"2.0.1",
+        "version":"2.0.0",
         "requirement": "<"
     }
 ]

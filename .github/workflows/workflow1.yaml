@@ -36,9 +36,9 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
          terraform_version: 1.4.1
-      # - name: Terraform init
-      #   id: init
-      #   run: terraform init
+      - name: Terraform init
+        id: init
+        run: terraform init
       # - name: Listing
       #   run: |
       #     ls -lrt 

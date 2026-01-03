@@ -15,6 +15,9 @@ permissions:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./challenge3
     steps:
       - name: "Git clone the repository"
         uses: actions/checkout@v3

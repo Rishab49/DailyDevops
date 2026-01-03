@@ -32,7 +32,7 @@ resource "aws_instance" "instance1" {
   subnet_id              = aws_subnet.subnet1.id
   vpc_security_group_ids = [aws_security_group.SG1.id]
 
-  user_data = <<-EOF
+  user_data = <<EOF
     #!/bin/bash
     dnf update -y
     dnf install -y docker

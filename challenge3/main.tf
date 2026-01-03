@@ -26,6 +26,7 @@ resource "aws_subnet" "subnet1" {
   }
 }
 
+
 resource "aws_instance" "instance1" {
   ami                    = "ami-068c0051b15cdb816"
   instance_type          = "t2.micro"

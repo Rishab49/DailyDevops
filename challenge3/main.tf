@@ -40,6 +40,10 @@ sudo dnf install -y docker
 sudo systemctl start docker
 sudo systemctl enable docker
 
+
+sudo docker run -d --name nginx -p 80:80 nginx
+ip=$(sudo docker inspect -f '{{.NetworkSettings.IPAddress}}' nginx)
+
 # Create the config file
 cat <<CONF > /home/ec2-user/prometheus.yml
 global:
@@ -49,11 +53,10 @@ global:
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['$ip:9090']
 CONF
 
-# Run the container
-docker run -d \
+sudo docker run -d \
   --name my-prometheus \
   -p 9090:9090 \
   -v prometheus-data:/prometheus \

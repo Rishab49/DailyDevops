@@ -61,7 +61,7 @@ docker run -d \
   prom/prometheus
   EOF
 
-user_data_replace_on_change = true
+  user_data_replace_on_change = true
 }
 
 

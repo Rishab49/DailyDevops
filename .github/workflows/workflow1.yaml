@@ -38,7 +38,7 @@ jobs:
          terraform_version: 1.4.1
       - name: Terraform init
         id: init
-        run: terraform init -backend-config="bucket=rajrishab-challenge2"
+        run: terraform init
       - name: Listing
         run: |
           ls -lrt 

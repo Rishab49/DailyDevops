@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-    - challenge2/**
+    - challenge3/**
     
 
 permissions:

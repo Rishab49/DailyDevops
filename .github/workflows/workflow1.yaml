@@ -34,6 +34,10 @@ jobs:
       - name: Terraform init
         id: init
         run: terraform init -backend-config="bucket=rajrishab-challenge2"
+      - name: Listing
+        run: |
+          ls -lrt 
+          df  -h
       - name: Terraform format
         id: fmt
         run: terraform fmt -check

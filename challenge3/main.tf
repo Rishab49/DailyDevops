@@ -34,14 +34,14 @@ resource "aws_instance" "instance1" {
   vpc_security_group_ids = [aws_security_group.SG1.id]
 
   user_data = <<EOF
-    #!/bin/bash
-    dnf update -y
-    dnf install -y docker
-    systemctl start docker
-    systemctl enable docker
+#!/bin/bash
+sudo dnf update -y
+sudo dnf install -y docker
+sudo systemctl start docker
+sudo systemctl enable docker
 
-    # Create the config file
-    cat <<CONF > /home/ec2-user/prometheus.yml
+# Create the config file
+cat <<CONF > /home/ec2-user/prometheus.yml
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
@@ -52,14 +52,16 @@ scrape_configs:
       - targets: ['localhost:9090']
 CONF
 
-    # Run the container
-    docker run -d \
-      --name my-prometheus \
-      -p 9090:9090 \
-      -v prometheus-data:/prometheus \
-      -v /home/ec2-user/prometheus.yml:/etc/prometheus/prometheus.yml \
-      prom/prometheus
+# Run the container
+docker run -d \
+  --name my-prometheus \
+  -p 9090:9090 \
+  -v prometheus-data:/prometheus \
+  -v /home/ec2-user/prometheus.yml:/etc/prometheus/prometheus.yml \
+  prom/prometheus
   EOF
+
+user_data_replace_on_change = true
 }
 
 

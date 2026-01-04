@@ -44,7 +44,7 @@ Inside workflow are are only checking out the challeneg3 folder and then running
  - name: "configure aws credentials"
         uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
-          role-to-assume: arn:aws:iam::814257528178:role/role-challenge2 
+          role-to-assume: <ARN>
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: "us-east-1"
 

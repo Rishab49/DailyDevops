@@ -34,6 +34,7 @@ jobs:
       - name: "linting" 
         working-directory: challenge4/python
         run: |
+          pip install -r requirements.txt
           pip install pylint
           pylint app.py
           if [ echo $? -nq 0 ]:

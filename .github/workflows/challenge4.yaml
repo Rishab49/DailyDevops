@@ -43,7 +43,7 @@ jobs:
       - name: "configure aws credentials"
         uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
-          role-to-assume: ${{ secrets.challenge4_ARN }}
+          role-to-assume: ${{ secrets.CHALLENGE4_ARN }}
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: "us-east-1"
       - name: Sts GetCallerIdentity

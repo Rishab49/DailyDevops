@@ -1,0 +1,67 @@
+name: "Terraform EC2 workflow"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+    - challenge4/**
+    
+
+permissions:
+      id-token: write
+      contents: read 
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./challenge4
+    steps:
+      - name: "Git clone the repository"
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: challenge4
+      - name: "setup python"
+        uses: actions/setup-python@v6
+      - name: "linting" 
+        working-directory: ./python
+        with:
+          python-version: '3.13'
+        run: |
+          pip install pylint
+          pylint app.py
+          if [ echo $? -nq 0 ]:
+            exit 1
+      - name: "configure aws credentials"
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: ${{ secrets.challenge4_ARN }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: "us-east-1"
+      - name: Sts GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
+      - name: "Setup Terraform with specified version on the runner"
+        uses: hashicorp/setup-terraform@v3
+        with:
+         terraform_version: 1.4.1
+      - name: Terraform init
+        id: init
+        run: terraform init
+      - name: Terraform format
+        id: fmt
+        run: terraform fmt -check
+      - name: Terraform validate
+        id: validate
+        run: terraform validate
+      - name: Terraform plan
+        id: plan
+        run: terraform plan -no-color -input=false
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false
+      # - name: deleting
+      #   run: terraform destroy --auto-approve
+
+

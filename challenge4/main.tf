@@ -7,7 +7,7 @@ terraform {
 
   backend "s3" {
     region = "us-east-1"
-    bucket = "rajrishab-challenge2"
+    bucket = "rajrishab-challenge4"
     key    = "state"
   }
 }
@@ -17,54 +17,93 @@ resource "aws_vpc" "main" {
 
 resource "aws_subnet" "subnet1" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.0.0/24"
+  cidr_block              = "10.0.1.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
+}
 
-  tags = {
-    Name = "tf-example"
+resource "aws_subnet" "subnet2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "us-east-1b" # Different AZ
+  map_public_ip_on_launch = true
+}
+
+
+resource "aws_lb" "lb" {
+  name               = "lb"
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.SG1.id]
+  subnets            = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
+}
+
+
+resource "aws_lb_target_group" "TG" {
+
+  name     = "TG"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+
+  health_check {
+    path = "/health/"
   }
 }
 
 
-resource "aws_instance" "instance1" {
-  ami                    = "ami-068c0051b15cdb816"
-  instance_type          = "t2.micro"
-  subnet_id              = aws_subnet.subnet1.id
-  vpc_security_group_ids = [aws_security_group.SG1.id]
+resource "aws_lb_listener" "LBListener" {
+  load_balancer_arn = aws_lb.lb.arn
+  port              = 80
+  protocol          = "HTTP"
 
-  user_data = <<EOF
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.TG.arn
+  }
+}
+
+resource "aws_launch_template" "launch_template" {
+
+
+
+  image_id      = "ami-068c0051b15cdb816"
+  instance_type = "t2.micro"
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.SG1.id]
+  }
+  update_default_version = true
+
+  user_data = base64encode(<<EOF
 #!/bin/bash
 sudo dnf update -y
 sudo dnf install -y docker
+sudo dnf install git -y
 sudo systemctl start docker
 sudo systemctl enable docker
 
+git clone git@github.com:Rishab49/DailyDevops.git 
+cd DailyDevops/challenge4/python
+docker build -t challenge4 .
+docker run --name challenge4 -p 80:80 challenge4
+EOF
+  )
+}
 
-sudo docker run -d --name nginx -p 80:80 nginx
-ip=$(sudo docker inspect -f '{{.NetworkSettings.IPAddress}}' nginx)
 
-# Create the config file
-cat <<CONF > /home/ec2-user/prometheus.yml
-global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
+resource "aws_autoscaling_group" "ASG1" {
+  name                = "ASG1"
+  vpc_zone_identifier = aws_subnet.subnet1.id
+  max_size            = 2
+  min_size            = 1
+  desired_capacity    = 1
 
-scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['$ip:9090']
-CONF
 
-sudo docker run -d \
-  --name my-prometheus \
-  -p 9090:9090 \
-  -v prometheus-data:/prometheus \
-  -v /home/ec2-user/prometheus.yml:/etc/prometheus/prometheus.yml \
-  prom/prometheus
-  EOF
+  target_group_arns = [aws_lb_target_group.TG.arn]
 
-  user_data_replace_on_change = true
+  launch_template {
+    id = aws_launch_template.launch_template.id
+  }
 }
 
 

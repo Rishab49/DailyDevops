@@ -37,7 +37,7 @@ jobs:
           pip install -r requirements.txt
           pip install pylint
           pylint app.py
-          if [ $? -nq 0 ]; then
+          if [ $? -ne 0 ]; then
             exit 1
           fi
       - name: "configure aws credentials"

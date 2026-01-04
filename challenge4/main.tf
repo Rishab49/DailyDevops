@@ -6,7 +6,7 @@ terraform {
   }
 
   backend "s3" {
-    region = "us-east-1"
+    region = "us-east-2"
     bucket = "rajrishab-challenge4"
     key    = "state"
   }
@@ -82,10 +82,10 @@ sudo dnf install git -y
 sudo systemctl start docker
 sudo systemctl enable docker
 
-git clone git@github.com:Rishab49/DailyDevops.git 
+sudo git clone https://github.com/Rishab49/DailyDevops.git
 cd DailyDevops/challenge4/python
-docker build -t challenge4 .
-docker run --name challenge4 -p 80:80 challenge4
+sudo docker build -t challenge4 .
+sudo docker run --name challenge4 -p 80:80 challenge4
 EOF
   )
 }
@@ -93,7 +93,7 @@ EOF
 
 resource "aws_autoscaling_group" "ASG1" {
   name                = "ASG1"
-  vpc_zone_identifier = aws_subnet.subnet1.id
+  vpc_zone_identifier = [aws_subnet.subnet1.id,aws_subnet.subnet2.id]
   max_size            = 2
   min_size            = 1
   desired_capacity    = 1
@@ -176,6 +176,11 @@ resource "aws_route_table" "route_table" {
 
 resource "aws_route_table_association" "route_table_association" {
   subnet_id      = aws_subnet.subnet1.id
+  route_table_id = aws_route_table.route_table.id
+}
+
+resource "aws_route_table_association" "route_table_association2" {
+  subnet_id      = aws_subnet.subnet2.id
   route_table_id = aws_route_table.route_table.id
 }
 

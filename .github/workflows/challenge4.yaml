@@ -25,10 +25,10 @@ jobs:
           sparse-checkout: challenge4
       - name: "setup python"
         uses: actions/setup-python@v6
-      - name: "linting" 
-        working-directory: ./python
         with:
           python-version: '3.13'
+      - name: "linting" 
+        working-directory: ./python
         run: |
           pip install pylint
           pylint app.py

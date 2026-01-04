@@ -25,7 +25,7 @@ jobs:
           sparse-checkout: challenge4
       - name: "listing"
         run: |
-          ls lrt
+          ls -lrt
           pwd
       - name: "setup python"
         uses: actions/setup-python@v6

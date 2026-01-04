@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: "linting" 
-        working-directory: ./python
+        working-directory: python
         run: |
           pip install pylint
           pylint app.py

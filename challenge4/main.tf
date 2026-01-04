@@ -93,7 +93,7 @@ EOF
 
 resource "aws_autoscaling_group" "ASG1" {
   name                = "ASG1"
-  vpc_zone_identifier = [aws_subnet.subnet1.id,aws_subnet.subnet2.id]
+  vpc_zone_identifier = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
   max_size            = 2
   min_size            = 1
   desired_capacity    = 1

@@ -37,8 +37,9 @@ jobs:
           pip install -r requirements.txt
           pip install pylint
           pylint app.py
-          if [ echo $? -nq 0 ]:
+          if [ $? -nq 0 ]; then
             exit 1
+          fi
       - name: "configure aws credentials"
         uses: aws-actions/configure-aws-credentials@v1.7.0
         with:

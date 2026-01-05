@@ -43,8 +43,9 @@ jobs:
         run: terraform plan
       - name: "terraform apply"
         run: terraform apply --auto-approve
+      - name: "update kubeconfig"
+        run: aws eks update-kubeconfig --name my-cluster-name --region us-east-1
       - name: "applying config"
-        uses: aws-actions/amazon-eks-action
-        with: 
-          cluster-name: mycluster
-          command: kubectl apply -f kubernetes/
+        run: |
+          kubectl get nodes
+          kubectl apply -f kubernetes/

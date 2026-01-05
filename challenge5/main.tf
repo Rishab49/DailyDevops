@@ -102,6 +102,11 @@ resource "aws_route_table_association" "association2" {
   route_table_id = aws_route_table.rt1.id
 }
 
+resource "aws_route_table_association" "association3" {
+  subnet_id      = aws_subnet.subnet3.id
+  route_table_id = aws_route_table.rt1.id
+}
+
 #eks
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -123,5 +128,5 @@ module "eks" {
 
   vpc_id                   = aws_vpc.main.id
   subnet_ids               = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
-  control_plane_subnet_ids = [aws_subnet.subnet3.id]
+  control_plane_subnet_ids = [aws_subnet.subnet3.id, aws_subnet.subnet1.id]
 }

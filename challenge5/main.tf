@@ -100,7 +100,6 @@ resource "aws_route_table_association" "association2" {
 
 
 #eks
-
 module "eks"{
     source = "terraform-aws-modules/eks/aws"
     version = "~> 20.31"

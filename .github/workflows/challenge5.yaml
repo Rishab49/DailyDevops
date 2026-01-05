@@ -25,7 +25,7 @@ jobs:
         with:
           sparse-checkout: challenge4
       - name: "configure aws"
-        uses: aws-actions/configure-aws-credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
           role-to-assume: ${{ secrets.challenge5_arn }}
           aws-region: "us-east-1"

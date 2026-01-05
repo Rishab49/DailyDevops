@@ -101,7 +101,8 @@ module "eks" {
   version = "~> 21.0"
 
 
-  cluster_name                             = "mycluster"
+  name                                     = "mycluster"
+  kubernetes_version                       = "1.33"
   enable_cluster_creator_admin_permissions = true
 
   eks_managed_node_groups = {
@@ -113,7 +114,7 @@ module "eks" {
     }
   }
 
-
-  vpc_id     = aws_vpc.main.id
-  subnet_ids = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
+  vpc_id                   = aws_vpc.main.id
+  subnet_ids               = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
+  control_plane_subnet_ids = [aws_subnet.subnet1.id]
 }

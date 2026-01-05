@@ -107,6 +107,9 @@ module "eks" {
   cluster_version = "20.31"
 
 
+  enable_cluster_creator_admin_permissions = true
+
+
   eks_managed_node_groups = {
     group1 = {
       instance_types = ["t2.micro"]

@@ -101,15 +101,12 @@ module "eks" {
   version = "~> 21.0"
 
 
-  name               = "mycluster"
-  kubernetes_version = "1.33"
-
-
+  cluster_name               = "mycluster"
   enable_cluster_creator_admin_permissions = true
 
   eks_managed_node_groups = {
     group1 = {
-      instance_types = ["t2.micro"]
+      instance_types = ["t3.small"]
       min_size       = 1
       max_size       = 3
       desired_size   = 2

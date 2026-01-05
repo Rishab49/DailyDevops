@@ -33,6 +33,13 @@ resource "aws_subnet" "subnet2" {
   map_public_ip_on_launch = true
 }
 
+resource "aws_subnet" "subnet3" {
+  vpc_id                  = aws_vpc.main.id
+  availability_zone       = "us-east-2a"
+  cidr_block              = "10.0.3.0/24"
+  map_public_ip_on_launch = true
+}
+
 
 
 # sg
@@ -116,5 +123,5 @@ module "eks" {
 
   vpc_id                   = aws_vpc.main.id
   subnet_ids               = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
-  control_plane_subnet_ids = [aws_subnet.subnet1.id]
+  control_plane_subnet_ids = [aws_subnet.subnet3.id]
 }

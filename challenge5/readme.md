@@ -18,3 +18,5 @@ Push it to Amazon ECR (Elastic Container Registry).
 Update the Kubernetes deployment with the new image tag using kubectl.
 
 # Solution
+
+

@@ -101,7 +101,7 @@ module "eks" {
   version = "~> 21.0"
 
 
-  cluster_name               = "mycluster"
+  cluster_name                             = "mycluster"
   enable_cluster_creator_admin_permissions = true
 
   eks_managed_node_groups = {

@@ -99,7 +99,6 @@ resource "aws_route_table_association" "association2" {
 }
 
 
-
 #eks
 
 module "eks"{

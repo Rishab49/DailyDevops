@@ -50,19 +50,19 @@ jobs:
           terraform_version: 1.5.7
       - name: "terraform init"
         run: terraform init
-      - name: "Terraform format"
-        run: terraform fmt -check
-      - name: "Terraform validate"
-        run: terraform validate
-      - name: "Terraform plan"
-        run: terraform plan
-      - name: "terraform apply"
-        run: terraform apply --auto-approve
-      - name: "update kubeconfig"
-        run: aws eks update-kubeconfig --name mycluster --region us-east-1
-      - name: "applying config"
-        run: |
-          kubectl get nodes
-          kubectl apply -f kubernetes/
-      # - name: "delete cluster"
-      #   run: terraform destroy --auto-approve
+      # - name: "Terraform format"
+      #   run: terraform fmt -check
+      # - name: "Terraform validate"
+      #   run: terraform validate
+      # - name: "Terraform plan"
+      #   run: terraform plan
+      # - name: "terraform apply"
+      #   run: terraform apply --auto-approve
+      # - name: "update kubeconfig"
+      #   run: aws eks update-kubeconfig --name mycluster --region us-east-1
+      # - name: "applying config"
+      #   run: |
+      #     kubectl get nodes
+      #     kubectl apply -f kubernetes/
+      - name: "delete cluster"
+        run: terraform destroy --auto-approve

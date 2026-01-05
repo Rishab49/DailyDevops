@@ -100,11 +100,11 @@ resource "aws_route_table_association" "association2" {
 #eks
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.31"
+  version = "~> 21.0"
 
 
-  cluster_name    = "mycluster"
-  cluster_version = "20.31"
+  name               = "mycluster"
+  kubernetes_version = "1.33"
 
 
   enable_cluster_creator_admin_permissions = true

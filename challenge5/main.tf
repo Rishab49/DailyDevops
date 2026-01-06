@@ -12,122 +12,126 @@ terraform {
   }
 }
 
-# vpc
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
+
+
+provider "aws" {
+  region = var.aws_region
 }
 
-# 2 subnet
-resource "aws_subnet" "subnet1" {
-  vpc_id                  = aws_vpc.main.id
-  availability_zone       = "us-east-1a"
-  cidr_block              = "10.0.1.0/24"
-  map_public_ip_on_launch = true
+data "aws_availability_zones" "available" {}
+
+resource "aws_security_group" "all_worker_mgmt" {
+  name_prefix = "all_worker_management"
+  vpc_id      = module.vpc.vpc_id
 }
 
-
-resource "aws_subnet" "subnet2" {
-  vpc_id                  = aws_vpc.main.id
-  availability_zone       = "us-east-1b"
-  cidr_block              = "10.0.2.0/24"
-  map_public_ip_on_launch = true
+resource "aws_security_group_rule" "all_worker_mgmt_ingress" {
+  description       = "allow inbound traffic from eks"
+  from_port         = 0
+  protocol          = "-1"
+  to_port           = 0
+  security_group_id = aws_security_group.all_worker_mgmt.id
+  type              = "ingress"
+  cidr_blocks = [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16",
+  ]
 }
 
-resource "aws_subnet" "subnet3" {
-  vpc_id                  = aws_vpc.main.id
-  availability_zone       = "us-east-1c"
-  cidr_block              = "10.0.3.0/24"
-  map_public_ip_on_launch = true
+resource "aws_security_group_rule" "all_worker_mgmt_egress" {
+  description       = "allow outbound traffic to anywhere"
+  from_port         = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.all_worker_mgmt.id
+  to_port           = 0
+  type              = "egress"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.7.0"
 
+  name                 = "abhi-eks-vpc"
+  cidr                 = var.vpc_cidr
+  azs                  = data.aws_availability_zones.available.names
+  private_subnets      = ["10.0.1.0/24", "10.0.2.0/24"]
+  public_subnets       = ["10.0.4.0/24", "10.0.5.0/24"]
+  enable_nat_gateway   = true
+  single_nat_gateway   = true
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 
-# sg
-resource "aws_security_group" "sg1" {
-  vpc_id = aws_vpc.main.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  tags = {
+    "kubernetes.io/cluster/rajrishab-eks-cluster" = "shared"
   }
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  public_subnet_tags = {
+    "kubernetes.io/cluster/rajrishab-eks-cluster" = "shared"
+    "kubernetes.io/role/elb"                      = "1"
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+  private_subnet_tags = {
+    "kubernetes.io/cluster/rajrishab-eks-cluster" = "shared"
+    "kubernetes.io/role/internal-elb"             = "1"
   }
 
-
 }
 
-
-# ig
-resource "aws_internet_gateway" "igw1" {
-  vpc_id = aws_vpc.main.id
-}
-
-# route table
-resource "aws_route_table" "rt1" {
-  vpc_id = aws_vpc.main.id
-
-  route {
-    cidr_block = "10.0.0.0/16"
-    gateway_id = "local"
-  }
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw1.id
-  }
-}
-
-resource "aws_route_table_association" "association1" {
-  subnet_id      = aws_subnet.subnet1.id
-  route_table_id = aws_route_table.rt1.id
-}
-
-
-resource "aws_route_table_association" "association2" {
-  subnet_id      = aws_subnet.subnet2.id
-  route_table_id = aws_route_table.rt1.id
-}
-
-resource "aws_route_table_association" "association3" {
-  subnet_id      = aws_subnet.subnet3.id
-  route_table_id = aws_route_table.rt1.id
-}
-
-
-#eks
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
 
 
-  name                                     = "mycluster"
-  kubernetes_version                       = "1.33"
-  enable_cluster_creator_admin_permissions = true
+  name       = "rajrishab-eks-cluster"
+  subnet_ids = module.vpc.private_subnets
 
-  eks_managed_node_groups = {
-    group1 = {
-      instance_types = ["t3.small"]
-      min_size       = 1
-      max_size       = 3
-      desired_size   = 2
-    }
+  enable_irsa = true
+
+  tags = {
+    cluster = "demo"
   }
 
-  vpc_id                   = aws_vpc.main.id
-  subnet_ids               = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
-  control_plane_subnet_ids = [aws_subnet.subnet3.id, aws_subnet.subnet1.id]
+  vpc_id = module.vpc.vpc_id
+
+
+  eks_managed_node_groups = {
+
+    group1 = {
+      ami_type               = "AL2_x86_64"
+      instance_types         = ["t3.medium"]
+      vpc_security_group_ids = [aws_security_group.all_worker_mgmt.id]
+
+      min_size     = 2
+      max_size     = 3
+      desired_size = 2
+    }
+  }
 }
+
+
+
+output "cluster_id" {
+  description = "EKS cluster ID."
+  value       = module.eks.cluster_id
+}
+
+output "cluster_endpoint" {
+  description = "Endpoint for EKS control plane."
+  value       = module.eks.cluster_endpoint
+}
+
+output "cluster_security_group_id" {
+  description = "Security group ids attached to the cluster control plane."
+  value       = module.eks.cluster_security_group_id
+}
+
+output "region" {
+  description = "AWS region"
+  value       = var.aws_region
+}
+
+output "oidc_provider_arn" {
+  value = module.eks.oidc_provider_arn
+}  

@@ -84,8 +84,9 @@ module "eks" {
   version = "~> 21.0"
 
 
-  name       = "rajrishab-eks-cluster"
-  subnet_ids = module.vpc.private_subnets
+  name               = "rajrishab-eks-cluster"
+  kubernetes_version = var.kubernetes_version
+  subnet_ids         = module.vpc.private_subnets
 
   enable_irsa = true
 

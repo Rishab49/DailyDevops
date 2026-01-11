@@ -53,15 +53,18 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.7.0"
 
-  name                 = "abhi-eks-vpc"
-  cidr                 = var.vpc_cidr
-  azs                  = data.aws_availability_zones.available.names
-  private_subnets      = ["10.0.1.0/24", "10.0.2.0/24"]
-  public_subnets       = ["10.0.4.0/24", "10.0.5.0/24"]
-  enable_nat_gateway   = true
-  single_nat_gateway   = true
-  enable_dns_hostnames = true
-  enable_dns_support   = true
+  name                    = "abhi-eks-vpc"
+  cidr                    = var.vpc_cidr
+  azs                     = data.aws_availability_zones.available.names
+  private_subnets         = ["10.0.1.0/24", "10.0.2.0/24"]
+  public_subnets          = ["10.0.4.0/24", "10.0.5.0/24"]
+  enable_nat_gateway      = true
+  single_nat_gateway      = true
+  one_nat_gateway_per_az  = false
+  enable_dns_hostnames    = true
+  enable_dns_support      = true
+  map_public_ip_on_launch = true
+
 
   tags = {
     "kubernetes.io/cluster/rajrishab-eks-cluster" = "shared"
@@ -86,27 +89,40 @@ module "eks" {
 
   name               = "rajrishab-eks-cluster"
   kubernetes_version = var.kubernetes_version
-  subnet_ids         = module.vpc.private_subnets
-
-  enable_irsa = true
+  subnet_ids         = module.vpc.public_subnets
+  enable_irsa        = true
 
   tags = {
     cluster = "demo"
   }
 
-  vpc_id = module.vpc.vpc_id
+  vpc_id                                   = module.vpc.vpc_id
+  enable_cluster_creator_admin_permissions = true
+
+
+  addons = {
+    coredns = {
+      most_recent = true
+    }
+
+    kube-proxy = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
+    }
+  }
 
 
   eks_managed_node_groups = {
 
-    group1 = {
-      ami_type               = "AL2_x86_64"
-      instance_types         = ["t3.medium"]
-      vpc_security_group_ids = [aws_security_group.all_worker_mgmt.id]
 
-      min_size     = 2
-      max_size     = 3
-      desired_size = 2
+    group1 = {
+      ami_type       = "AL2_x86_64"
+      instance_types = ["t3.medium"]
+      min_size       = 2
+      max_size       = 3
+      desired_size   = 2
     }
   }
 }

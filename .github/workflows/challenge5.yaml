@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - challenge5/**
+      - challengeNAN/**
 
 
 permissions:

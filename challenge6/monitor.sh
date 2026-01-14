@@ -6,7 +6,7 @@ NGINX_EXIT_CODE=$(systemctl status nginx)
 if [ $? -ne 0 ];then
     echo "NGINX is not started."
     echo "Attempting to start it"
-    sudo systemctl start nginx
+    systemctl start nginx
 else
     echo "NGINX is in running state"
 fi

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-if ! id -nG "$USER" | grep -qw "sudo"; then
+if ! id -nG "$USER" | grep -qw "wheel"; then
     echo "Error: This script can only be executed by members of the 'sudo' group."
     exit 1
 fi

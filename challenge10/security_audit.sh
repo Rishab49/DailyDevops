@@ -1,7 +1,7 @@
 #!/bin/bash
 
 HOME_WORLD_WRITABLES=$(find /home -maxdepth 2 -type f  -exec stat -c "%A %n" {} + 2> /dev/null)
-ETC_WORLD_WRITABLES=$(find /etc -maxdepth 2 -type f  -exec stat -c "%A %n" {} + 2> /dev/null)
+ETC_WORLD_WRITABLES=$(find /tmp -maxdepth 2 -type f  -exec stat -c "%A %n" {} + 2> /dev/null)
 echo "$HOME_WORLD_WRITABLES" | awk '{
     permission=substr($1,9,1)
     printf "%s\n",permission
@@ -21,7 +21,7 @@ echo "$ETC_WORLD_WRITABLES" | awk '{
     } 
 }'
 
-
+# current user is in sudo group but still it will ask for password because the directory /var/log/secure does not have any permission for group and others
 sudo grep "Failed password" /var/log/secure
 
 # echo "$HOME_WORLD_WRITABLES"

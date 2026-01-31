@@ -1,0 +1,1 @@
+ansible-playbook -i hosts hardening.yml -u ansible --become -K --check --diff

@@ -1,0 +1,49 @@
+---
+- name: Check NGINX and MYSQL is INSTALLED, STARTED and ENABLED
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Starting and enabling services
+    ansible.builtin.systemd:
+      name: "{{ item }}"
+      enabled: yes
+      state: started
+    loop:
+      - nginx
+      - mysqld
+
+
+- name: Copying the index file
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Copy file
+    ansible.builtin.copy:
+      src: ./index.html
+      dest: /usr/share/nginx/html/index.html
+      owner: root
+      group: root
+
+
+- name: Ensuring root login is not premitted
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Ensure 
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '^PermitRootLogin'
+      line: "PermitRootLogin no"
+      state: present
+    become: true
+    register: config_check_result
+  - name: Log if changed
+    ansible.builtin.shell: logger -p local5.warn "DRIFT DETECTED"
+    when: config_check_result.changed
+    check_mode: false
+
+
+
+  
+  
+

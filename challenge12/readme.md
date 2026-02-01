@@ -37,7 +37,7 @@ I have installed mysql using dnf.
 
 ## DB and user creation
 
-I have created a new db using `create database app_db;` command and then created a new user using `create user 'app_user'@'localhost' indetified by '<PASSWORD>'` and as new users do not have any permissions we need to grant permission to the user using `grant select, insert, update privilege on app_db.* to 'app_user'@'localhost'`
+I have created a new db using `create database app_db;` command and then created a new user using `create user 'app_user'@'localhost' identified by '<PASSWORD>'` and as new users do not have any permissions we need to grant permission to the user using `grant select, insert, update privilege on app_db.* to 'app_user'@'localhost'`
 
 
 ## Monitor.sh

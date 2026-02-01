@@ -1,0 +1,42 @@
+---
+- name: Deploying infra
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Make sure packages are installed
+    ansible.builtin.yum:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - mysql-community-server
+      - nginx
+      - haproxy
+  - name: Make sure packages are enabled and installed
+    ansible.builtin.systemd:
+      name: "{{ item }}"
+      enabled: true
+      state: started
+    loop:
+      - nginx
+      - mysqld
+      - haproxy
+  - name: Configuring nginx
+    ansible.builtin.copy:
+      src: ./lb.conf
+      dest: /etc/nginx/conf.d/lb.conf
+      owner: root
+      group: root
+      mode: "0644"
+  - name: Configuring HAPROXY
+    ansible.builtin.copy:
+      src: ./ha.cfg
+      dest: /etc/haproxy/conf.d/ha.cfg
+      owner: root
+      group: root
+      mode: "0644"
+  - name: Make sure socket is enabled
+    ansible.builtin.lineinfile:
+      path: /etc/haproxy/haproxy.cfg
+      line: "    stats socket /var/lib/haproxy/stats mode 660 level admin"
+      insertafter: "^global$"
+      state: present

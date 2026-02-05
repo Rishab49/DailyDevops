@@ -1,0 +1,19 @@
+groups:
+  - name: Rule1
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Target {{ $labels.instance }} is down"
+      - alert: HighCPUUtilization
+        expr: 100 * (1 - avg by(instance) (rate(node_cpu_seconds_total{node="idle"}[2m]))) > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Target {{ $labels.instance }} is having high CPU Utilization"
+          description: "CPU is at {{ $value | printf \" %.2f \"}} for more than 10 mins"
+

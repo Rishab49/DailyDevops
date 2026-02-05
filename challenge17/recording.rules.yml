@@ -1,0 +1,5 @@
+groups:
+  - name: RecordRule1
+    rules:
+      - record: job:node_cpu:percent
+        expr: 100 * (1 - avg by(instance) (rate(node_cpu_seconds_total{node="idle"}[2m])))

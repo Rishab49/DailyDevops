@@ -1,0 +1,11 @@
+[Unit]
+Description=Log collector for grafana
+
+[Service]
+User=loki
+Group=loki
+ExecStart=/usr/local/bin/loki -config.file=/etc/loki/loki-local-config.yaml
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

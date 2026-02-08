@@ -1,0 +1,11 @@
+[Unit]
+Description= Log collector
+
+[Service]
+User=filebeat
+Group=filebeat
+ExecStart=/usr/local/bin/filebeat -c /etc/filebeat/filebeat.yml --path.data=/etc/filebeat --path.home=/etc/filebeat --path.logs=/etc/filebeat
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
